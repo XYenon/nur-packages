@@ -14,20 +14,21 @@
 , kirigami2
 , kconfig
 , libkazv
+, breeze-icons
 , unstableGitUpdater
 }:
 
 stdenv.mkDerivation rec {
   pname = "kazv";
-  version = "unstable";
+  version = "unstable-2023-06-25";
 
   src = fetchFromGitLab {
     domain = "lily-is.land";
     owner = "kazv";
     repo = pname;
     fetchSubmodules = true;
-    rev = "c78cf365484057f1e4b408c3168e843a4331460d";
-    hash = "sha256-bb4ayXWPshV/BpX6+BZuZkl6klLQDLsBRiauI/WCiB8=";
+    rev = "07ef5e8b34e8f9431677bb11568ff8971e35dc8e";
+    hash = "sha256-7w5uBdZiiNGI2V0FDLwqgoMM6lPSfOf+p8A+Kj66XDI=";
   };
 
   nativeBuildInputs = [ wrapQtAppsHook cmake pkg-config ];
@@ -47,6 +48,8 @@ stdenv.mkDerivation rec {
 
     libkazv
   ];
+
+  propagatedBuildInputs = [ breeze-icons ];
 
   passthru.updateScript = unstableGitUpdater { };
 
