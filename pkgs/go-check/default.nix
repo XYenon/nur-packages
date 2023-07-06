@@ -1,11 +1,8 @@
-{ lib, fetchFromGitHub, buildGoModule }:
+{ lib, fetchFromGitHub, buildGoModule, unstableGitUpdater }:
 
-let
+buildGoModule rec {
   pname = "go-check";
-in
-buildGoModule {
-  pname = pname;
-  version = "2023.01.05-1";
+  version = "unstable-2023-01-05";
 
   src = fetchFromGitHub {
     owner = "Dreamacro";
@@ -15,7 +12,10 @@ buildGoModule {
   };
 
   vendorHash = "sha256-P91+lPalXhkZgFuMBjTUDp2zgksOkF2G9rqnHZWSDYo=";
+
   subPackages = [ "." ];
+
+  passthru.updateScript = unstableGitUpdater { };
 
   meta = with lib; {
     description = "Check for outdated go module";

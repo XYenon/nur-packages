@@ -1,4 +1,4 @@
-{ rustPlatform, fetchFromGitHub, bash, lib }:
+{ rustPlatform, fetchFromGitHub, bash, lib, nix-update-script }:
 
 rustPlatform.buildRustPackage rec {
   pname = "catp";
@@ -6,17 +6,19 @@ rustPlatform.buildRustPackage rec {
 
   src = fetchFromGitHub {
     owner = "rapiz1";
-    repo = "catp";
+    repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-yYvJJFXEOxUz+R50ioyHQp3GqF4V8J+vYBPxh4AuA3E=";
+    hash = "sha256-yYvJJFXEOxUz+R50ioyHQp3GqF4V8J+vYBPxh4AuA3E=";
   };
 
-  cargoSha256 = "sha256-ErJif5ZOgMPYaUdsaTcLqJVIgl0pYRHdI2+XiNjdee4=";
+  cargoHash = "sha256-ErJif5ZOgMPYaUdsaTcLqJVIgl0pYRHdI2+XiNjdee4=";
 
   checkInputs = [ bash ];
   preCheck = ''
     patchShebangs tests/scripts/*
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "Print the output of a running process";

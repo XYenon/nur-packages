@@ -14,6 +14,7 @@
 , kirigami2
 , kconfig
 , libkazv
+, unstableGitUpdater
 }:
 
 stdenv.mkDerivation rec {
@@ -46,6 +47,8 @@ stdenv.mkDerivation rec {
 
     libkazv
   ];
+
+  passthru.updateScript = unstableGitUpdater { };
 
   meta = with lib; {
     description = "A convergent qml/kirigami matrix client based on libkazv";

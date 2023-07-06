@@ -11,6 +11,7 @@
 , olm
 , cryptopp
 , catch2_3
+, unstableGitUpdater
 }:
 
 let
@@ -129,6 +130,8 @@ stdenv.mkDerivation rec {
     "-Dlibkazv_BUILD_EXAMPLES=OFF"
     "-Dlibkazv_BUILD_TESTS=ON"
   ];
+
+  passthru.updateScript = unstableGitUpdater { };
 
   meta = with lib; {
     description = "A sans-io C++ (gnu++17) matrix client library";
