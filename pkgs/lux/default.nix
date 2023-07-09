@@ -2,13 +2,13 @@
 
 buildGoModule rec {
   pname = "lux";
-  version = "0.18.0";
+  version = "0.19.0";
 
   src = fetchFromGitHub {
     owner = "iawia002";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-A3DDKpoaZlDUpafAGs5zCknhTeCuwMPnyBHtxke0Bi8=";
+    hash = "sha256-klm1985qBErFfYIWPjr1/n6nYr/jA9dbrDMfw4bf1tM=";
   };
 
   vendorSha256 = "sha256-7wgGJYiIsVTRSuSb4a9LgYCkkayGhNMKqcIKoDxMuAM=";
