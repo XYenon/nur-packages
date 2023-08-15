@@ -24,7 +24,7 @@
 , stdenv
 , Foundation
 
-, unstableGitUpdater
+, nix-update-script
 }:
 
 rustPlatform.buildRustPackage rec {
@@ -91,7 +91,7 @@ rustPlatform.buildRustPackage rec {
 
   buildInputs = lib.optionals stdenv.isDarwin [ Foundation ];
 
-  passthru.updateScript = unstableGitUpdater { };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version" "branch" ]; };
 
   meta = with lib; {
     description = "Blazing fast terminal file manager written in Rust, based on async I/O";
