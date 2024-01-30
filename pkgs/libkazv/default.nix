@@ -5,6 +5,7 @@
 , cmake
 , pkg-config
 , immer-unstable
+, zug-unstable
 , boost
 , openssl
 , curl
@@ -16,25 +17,6 @@
 }:
 
 let
-  zug = stdenv.mkDerivation rec {
-    pname = "zug";
-    version = "unstable";
-    src = fetchFromGitHub {
-      owner = "arximboldi";
-      repo = pname;
-      rev = "d7e814b45fceceee3cb1442997d8b46cee4764ec";
-      hash = "sha256-zImjvOEW05lAPDcSWvGmWe2SyEdTyfj/DMgOc2C+hPM=";
-    };
-    nativeBuildInputs = [ cmake ];
-    buildInputs = [ boost ];
-    cmakeFlags = [ "-Dzug_BUILD_TESTS=ON" "-Dzug_BUILD_EXAMPLES=OFF" "-Dzug_BUILD_DOCS=OFF" ];
-    meta = with lib; {
-      homepage = "https://github.com/arximboldi/zug";
-      description = "Transducers for C++ — Clojure style higher order push/pull sequence transformations";
-      license = licenses.boost;
-    };
-  };
-
   lager = stdenv.mkDerivation rec {
     pname = "lager";
     version = "unstable";
@@ -45,7 +27,7 @@ let
       hash = "sha256-SJ3+DjMQ3ZRUtCov9rscNhk4Zsdqizcz4ae3szs/wro=";
     };
     nativeBuildInputs = [ cmake pkg-config ];
-    buildInputs = [ boost immer-unstable zug ];
+    buildInputs = [ boost immer-unstable zug-unstable ];
     cmakeFlags = [ "-Dlager_BUILD_TESTS=ON" "-Dlager_BUILD_EXAMPLES=OFF" "-Dlager_BUILD_DOCS=OFF" ];
     meta = with lib; {
       homepage = "https://github.com/arximboldi/lager";
@@ -91,7 +73,7 @@ stdenv.mkDerivation rec {
   propagatedBuildInputs = [
     lager
     immer-unstable
-    zug
+    zug-unstable
     boost
     nlohmann_json
     olm
