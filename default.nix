@@ -20,7 +20,8 @@ with pkgs; rec {
   github-copilot-cli = callPackage ./pkgs/github-copilot-cli { };
   immer-unstable = callPackage ./pkgs/immer { };
   zug-unstable = callPackage ./pkgs/zug { };
-  libkazv = callPackage ./pkgs/libkazv { inherit immer-unstable zug-unstable; };
+  lager-unstable = callPackage ./pkgs/lager { inherit immer-unstable zug-unstable; };
+  libkazv = callPackage ./pkgs/libkazv { inherit immer-unstable zug-unstable lager-unstable; };
   kazv = libsForQt5.callPackage ./pkgs/kazv { inherit libkazv; };
   nginxModules = recurseIntoAttrs (callPackage ./pkgs/nginx/modules.nix { });
   nginxStable = let nginxStable' = pkgs.nginxStable; in nginxStable'.override {
