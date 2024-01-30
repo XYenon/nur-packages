@@ -4,6 +4,7 @@
 , fetchFromGitLab
 , cmake
 , pkg-config
+, immer-unstable
 , boost
 , openssl
 , curl
@@ -15,29 +16,6 @@
 }:
 
 let
-  immer = stdenv.mkDerivation rec {
-    pname = "immer";
-    version = "unstable";
-    src = fetchFromGitHub {
-      owner = "arximboldi";
-      repo = pname;
-      rev = "5e9fe0b3476d1036824fc8934433ba3ddc85a90f";
-      hash = "sha256-6Re9+9upHW73k2q/lp65Azu06au1vw609U9QS8XXIO8=";
-    };
-    nativeBuildInputs = [ cmake ];
-    cmakeFlags = [
-      "-Dimmer_BUILD_TESTS=ON"
-      "-Dimmer_BUILD_EXAMPLES=OFF"
-      "-Dimmer_BUILD_DOCS=OFF"
-      "-Dimmer_BUILD_EXTRAS=OFF"
-    ];
-    meta = with lib; {
-      homepage = "http://sinusoid.es/immer";
-      description = "Postmodern immutable and persistent data structures for C++ — value semantics at scale";
-      license = licenses.boost;
-    };
-  };
-
   zug = stdenv.mkDerivation rec {
     pname = "zug";
     version = "unstable";
@@ -67,7 +45,7 @@ let
       hash = "sha256-SJ3+DjMQ3ZRUtCov9rscNhk4Zsdqizcz4ae3szs/wro=";
     };
     nativeBuildInputs = [ cmake pkg-config ];
-    buildInputs = [ boost immer zug ];
+    buildInputs = [ boost immer-unstable zug ];
     cmakeFlags = [ "-Dlager_BUILD_TESTS=ON" "-Dlager_BUILD_EXAMPLES=OFF" "-Dlager_BUILD_DOCS=OFF" ];
     meta = with lib; {
       homepage = "https://github.com/arximboldi/lager";
@@ -112,7 +90,7 @@ stdenv.mkDerivation rec {
 
   propagatedBuildInputs = [
     lager
-    immer
+    immer-unstable
     zug
     boost
     nlohmann_json

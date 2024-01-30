@@ -18,7 +18,8 @@ with pkgs; rec {
   go-check = callPackage ./pkgs/go-check { };
   catp = callPackage ./pkgs/catp { };
   github-copilot-cli = callPackage ./pkgs/github-copilot-cli { };
-  libkazv = callPackage ./pkgs/libkazv { };
+  immer-unstable = callPackage ./pkgs/immer { };
+  libkazv = callPackage ./pkgs/libkazv { inherit immer-unstable; };
   kazv = libsForQt5.callPackage ./pkgs/kazv { inherit libkazv; };
   nginxModules = recurseIntoAttrs (callPackage ./pkgs/nginx/modules.nix { });
   nginxStable = let nginxStable' = pkgs.nginxStable; in nginxStable'.override {
