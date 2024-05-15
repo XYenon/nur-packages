@@ -4,7 +4,10 @@ nginxVersion:
 let
   patch = with lib; findFirst
     (p: versionAtLeast nginxVersion p.versionAtLeast && versionOlder nginxVersion p.versionOlder)
-    (builtins.abort "No patch found for nginx version ${nginxVersion}")
+    (warn
+      "No patch found for nginx version ${nginxVersion}, try the latest patch."
+      { versionAtLeast = "1.26.0"; versionOlder = "99.99.99"; patchName = "proxy_connect_rewrite_102101"; }
+    )
     [
       { versionAtLeast = "1.4.0"; versionOlder = "1.13.0"; patchName = "proxy_connect_rewrite"; }
       { versionAtLeast = "1.13.0"; versionOlder = "1.15.0"; patchName = "proxy_connect_rewrite_1014"; }
