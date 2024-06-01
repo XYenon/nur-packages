@@ -6,6 +6,7 @@ let
     {
       exifaudio = callPackage ./exifaudio.nix { };
       fg = callPackage ./fg.nix { };
+      ouch = callPackage ./ouch.nix { };
     };
 in
 
