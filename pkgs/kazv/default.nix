@@ -8,11 +8,11 @@
   extra-cmake-modules,
   qtbase,
   qtdeclarative,
-  qtquickcontrols2,
   qtsvg,
   qtmultimedia,
   kio,
-  kirigami2,
+  kirigami,
+  kirigami-addons,
   kconfig,
   nlohmann_json,
   libkazv,
@@ -45,12 +45,12 @@ stdenv.mkDerivation rec {
 
     qtbase
     qtdeclarative
-    qtquickcontrols2
     qtsvg
     qtmultimedia
 
     kio
-    kirigami2
+    kirigami
+    kirigami-addons
     kconfig
 
     nlohmann_json
@@ -59,6 +59,8 @@ stdenv.mkDerivation rec {
   ];
 
   propagatedBuildInputs = [ breeze-icons ];
+
+  cmakeFlags = [ "-Dkazv_KF_QT_MAJOR_VERSION=6" ];
 
   passthru.updateScript = unstableGitUpdater { tagPrefix = "v"; };
 
