@@ -24,15 +24,8 @@ rec {
   zug-unstable = callPackage ./pkgs/zug { };
   lager-unstable = callPackage ./pkgs/lager { inherit immer-unstable zug-unstable; };
   vodozemac-bindings-kazv-unstable = callPackage ./pkgs/vodozemac-bindings-kazv { };
-  libkazv = callPackage ./pkgs/libkazv {
-    inherit
-      immer-unstable
-      zug-unstable
-      lager-unstable
-      vodozemac-bindings-kazv-unstable
-      ;
-  };
   kazv = kdePackages.callPackage ./pkgs/kazv { inherit libkazv; };
+  libkazv = callPackage ./pkgs/libkazv { inherit vodozemac-bindings-kazv-unstable; };
   nginxModules = callPackage ./pkgs/nginx/modules { };
   nginxStable =
     let
