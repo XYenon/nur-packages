@@ -20,7 +20,6 @@ rec {
 
   go-check = callPackage ./pkgs/go-check { };
   catp = callPackage ./pkgs/catp { };
-  zug-unstable = callPackage ./pkgs/zug { };
   lager-unstable = callPackage ./pkgs/lager { inherit immer-unstable zug-unstable; };
   vodozemac-bindings-kazv-unstable = callPackage ./pkgs/vodozemac-bindings-kazv { };
   libkazv = callPackage ./pkgs/libkazv { inherit vodozemac-bindings-kazv-unstable; };
