@@ -7,13 +7,13 @@
 
 stdenvNoCC.mkDerivation {
   pname = "yazi-rs-plugins";
-  version = "0-unstable-2025-03-04";
+  version = "0-unstable-2025-03-08";
 
   src = fetchFromGitHub {
     owner = "yazi-rs";
     repo = "plugins";
-    rev = "a1b678dfacfd2726fad364607aeaa7e1fded3cfa";
-    hash = "sha256-Vvq7uau+UNcriuLE7YMK5rSOXvVaD0ElT59q+09WwdQ=";
+    rev = "2bf70d880e02db95394de360668325b46f804791";
+    hash = "sha256-0A5UVbrP9+GRvX14VQm4Yxw+P9Ca5gtlk9qkLCVf5+Q=";
   };
 
   dontBuild = true;
