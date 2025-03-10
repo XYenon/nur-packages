@@ -6,7 +6,7 @@
 }:
 
 stdenvNoCC.mkDerivation {
-  pname = "git";
+  pname = "yazi-rs-plugins";
   version = "0-unstable-2025-03-04";
 
   src = fetchFromGitHub {
@@ -21,7 +21,7 @@ stdenvNoCC.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    cp -r git.yazi $out
+    cp -r $src $out
 
     runHook postInstall
   '';
@@ -29,8 +29,8 @@ stdenvNoCC.mkDerivation {
   passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = with lib; {
-    description = "Show the status of Git file changes as linemode in the file list";
-    homepage = "https://github.com/yazi-rs/plugins/tree/main/git.yazi";
+    description = "Place code snippets from docs into this monorepo, so that users can update more easily via package manager";
+    homepage = "https://github.com/yazi-rs/plugins";
     license = licenses.mit;
     maintainers = with maintainers; [ xyenon ];
   };
