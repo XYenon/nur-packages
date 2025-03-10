@@ -4,10 +4,22 @@ set -Eeuo pipefail
 
 root="$(readlink --canonicalize -- "$(dirname -- "$0")/..")"
 
+rust_overlay=$(
+	cat <<-EOF
+		let
+			lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+		in
+		import (builtins.fetchTarball {
+			url = "https://github.com/oxalica/rust-overlay/archive/\${lock.nodes.rust-overlay.locked.rev}.zip";
+			sha256 = lock.nodes.rust-overlay.locked.narHash;
+		})
+	EOF
+)
+
 # Run update scripts
 nixpkgs="$(nix-instantiate --eval --expr '<nixpkgs>')"
 nix-shell "$nixpkgs/maintainers/scripts/update.nix" --show-trace \
-	--arg include-overlays "[ (import ./overlay.nix) ]" \
+	--arg include-overlays "[ (import ./overlay.nix) ($rust_overlay) ]" \
 	--argstr keep-going 'true' \
 	--argstr commit 'true' \
 	--arg predicate "(

@@ -8,6 +8,10 @@
   };
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -17,6 +21,7 @@
     {
       self,
       nixpkgs,
+      rust-overlay,
       treefmt-nix,
     }:
     let
@@ -32,7 +37,13 @@
         treefmtEval.config.build.wrapper
       );
       legacyPackages = forAllSystems (
-        system: import ./default.nix { pkgs = import nixpkgs { inherit system; }; }
+        system:
+        import ./default.nix {
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ rust-overlay.overlays.default ];
+          };
+        }
       );
       packages = forAllSystems (
         system: nixpkgs.lib.filterAttrs (_: v: nixpkgs.lib.isDerivation v) self.legacyPackages.${system}

@@ -6,8 +6,17 @@
 # commands such as:
 #     nix-build -A mypackage
 
+let
+  lock = builtins.fromJSON (builtins.readFile ./flake.lock);
+in
 {
-  pkgs ? import <nixpkgs> { },
+  pkgs ? import <nixpkgs> { overlays = [ rust-overlay ]; },
+  rust-overlay ? import (
+    (import <nixpkgs> { }).fetchzip {
+      url = "https://github.com/oxalica/rust-overlay/archive/${lock.nodes.rust-overlay.locked.rev}.zip";
+      hash = lock.nodes.rust-overlay.locked.narHash;
+    }
+  ),
 }:
 
 with pkgs;
@@ -48,4 +57,5 @@ rec {
   anime4k = callPackage ./pkgs/anime4k { };
   yaziPlugins = callPackage ./pkgs/yazi/plugins { };
   telemikiya = callPackage ./pkgs/telemikiya { };
+  mq = callPackage ./pkgs/mq { };
 }
