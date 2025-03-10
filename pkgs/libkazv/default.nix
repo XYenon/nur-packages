@@ -60,7 +60,7 @@ stdenv.mkDerivation (finalAttrs: {
   passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = with lib; {
-    description = "A sans-io C++ (gnu++17) matrix client library";
+    description = "Sans-io C++ (gnu++17) matrix client library";
     homepage = "https://lily-is.land/kazv/libkazv";
     license = licenses.agpl3Plus;
     maintainers = with maintainers; [ xyenon ];
