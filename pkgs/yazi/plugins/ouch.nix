@@ -29,7 +29,7 @@ stdenvNoCC.mkDerivation {
   passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = with lib; {
-    description = "A Yazi plugin to preview archives";
+    description = "Yazi plugin to preview archives";
     homepage = "https://github.com/ndtoan96/ouch.yazi";
     license = licenses.mit;
     maintainers = with maintainers; [ xyenon ];
