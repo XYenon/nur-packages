@@ -27,7 +27,7 @@
   libkazv,
   cmark,
   breeze-icons,
-  unstableGitUpdater,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation {
@@ -81,7 +81,7 @@ stdenv.mkDerivation {
 
   cmakeFlags = [ "-Dkazv_KF_QT_MAJOR_VERSION=6" ];
 
-  passthru.updateScript = unstableGitUpdater { tagPrefix = "v"; };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = with lib; {
     description = "A convergent qml/kirigami matrix client based on libkazv";
