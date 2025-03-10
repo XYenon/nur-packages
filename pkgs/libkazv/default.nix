@@ -15,7 +15,7 @@
   libhttpserver,
   libmicrohttpd,
   catch2_3,
-  unstableGitUpdater,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -57,7 +57,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   checkInputs = [ catch2_3 ];
 
-  passthru.updateScript = unstableGitUpdater { tagPrefix = "v"; };
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = with lib; {
     description = "A sans-io C++ (gnu++17) matrix client library";
