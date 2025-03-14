@@ -57,4 +57,5 @@ rec {
       librime-octagram
     ];
   };
+  mq = callPackage ./pkgs/mq { };
 }
