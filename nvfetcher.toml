@@ -1,3 +1,7 @@
+[rime-moegirl]
+fetch.url = "https://github.com/outloudvi/mw2fcitx/releases/download/$ver/moegirl.dict.yaml"
+src.github = "outloudvi/mw2fcitx"
+
 [yazi-rs-plugins]
 fetch.github = "yazi-rs/plugins"
 src.git = "https://github.com/yazi-rs/plugins.git"

@@ -1,4 +1,19 @@
 {
+    "rime-moegirl": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "rime-moegirl",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "name": null,
+            "sha256": "sha256-LUKh0UMU0WVIWAGWogzWjqEVKCY7TTvWRueMeFxVslk=",
+            "type": "url",
+            "url": "https://github.com/outloudvi/mw2fcitx/releases/download/20250309/moegirl.dict.yaml"
+        },
+        "version": "20250309"
+    },
     "yazi-rs-plugins": {
         "cargoLocks": null,
         "date": "2025-03-12",

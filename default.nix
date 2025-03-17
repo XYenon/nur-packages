@@ -68,4 +68,5 @@ rec {
     ];
   };
   mq = callPackage ./pkgs/mq { };
+  rime-moegirl = callPackage ./pkgs/rime-moegirl { source = sources.rime-moegirl; };
 }
