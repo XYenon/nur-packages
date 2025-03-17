@@ -1,4 +1,46 @@
 {
+    "rime-ice": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "rime-ice",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "iDvel",
+            "repo": "rime-ice",
+            "rev": "2024.12.12",
+            "sha256": "sha256-2QZdlLGZwWIesbjYTE/2yhM1hHGVVp7jR02bR0oqxV0=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "2024.12.12"
+    },
+    "rime-ice-unstable": {
+        "cargoLocks": null,
+        "date": "2025-03-11",
+        "extract": null,
+        "name": "rime-ice-unstable",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "iDvel",
+            "repo": "rime-ice",
+            "rev": "75b225e84f5e95ddf0b5a50fa6e2cff9800ee7b7",
+            "sha256": "sha256-/sKoufIf4m5h1Zds6AqIyeCjDaZsFU9ot5ln3ykuNyU=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "75b225e84f5e95ddf0b5a50fa6e2cff9800ee7b7"
+    },
     "rime-moegirl": {
         "cargoLocks": null,
         "date": null,
