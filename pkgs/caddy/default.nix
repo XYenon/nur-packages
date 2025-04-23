@@ -1,11 +1,16 @@
 {
+  callPackage,
+  buildGo124Module,
   lib,
   sources,
-  callPackage,
+  go_1_24,
 }:
 
 let
-  caddy = callPackage ./package.nix { inherit caddy; };
+  caddy = callPackage ./package.nix {
+    inherit caddy;
+    buildGoModule = buildGo124Module;
+  };
   pluginRepos = [
     "WeidiDeng/caddy-cloudflare-ip"
     "caddy-dns/cloudflare"
@@ -40,7 +45,7 @@ let
       "${v.moduleName}@v0.0.0-${goDate}-${substring 0 12 v.version}"
     ) pluginSources;
 in
-caddy.withPlugins {
+(caddy.withPlugins.override { go = go_1_24; }) {
   inherit plugins;
-  hash = "sha256-14FUNoS5oRf81aQft2GU3Uo1sAFY5Nohle2R+ADrSAo=";
+  hash = "sha256-4r24IW/Lr5nStx61RpH2ePxlu6tJ7449AAE25+r+iI4=";
 }
