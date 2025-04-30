@@ -2,7 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
-  nix-update-script,
+  unstableGitUpdater,
 }:
 
 stdenvNoCC.mkDerivation {
@@ -27,7 +27,10 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
-  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
+  passthru.updateScript = unstableGitUpdater {
+    tagPrefix = "v";
+    tagFormat = "v*";
+  };
 
   meta = with lib; {
     description = "Bring a fresh JavaScript plugin ecosystem to the Rime Input Method Engine";
