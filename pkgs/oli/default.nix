@@ -2,6 +2,7 @@
   lib,
   rustPlatform,
   fetchgit,
+  nix-update-script,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
@@ -18,6 +19,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   useFetchCargoVendor = true;
   cargoHash = "sha256-NQQPj8w4eoic5fn/VSVe5OOGoj07jUXcTSFZN/q4Zoc=";
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Unified and user-friendly way to manipulate data stored in various storage service";
