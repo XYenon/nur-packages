@@ -1,7 +1,7 @@
 {
   lib,
   stdenv,
-  fetchFromGitLab,
+  fetchFromGitea,
   wrapQtAppsHook,
   cmake,
   pkg-config,
@@ -35,9 +35,9 @@ stdenv.mkDerivation {
   pname = "kazv";
   version = "0.6.0-unstable-2025-10-15";
 
-  src = fetchFromGitLab {
-    domain = "lily-is.land";
-    owner = "kazv";
+  src = fetchFromGitea {
+    domain = "codeberg.org";
+    owner = "the-kazv-project";
     repo = "kazv";
     fetchSubmodules = true;
     rev = "df06f29d6d857e11a542e2bfc5f33ec5d4f130cb";
