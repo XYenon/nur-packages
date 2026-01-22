@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup git
         run: |
@@ -51,7 +53,7 @@ jobs:
           fi
 
       - name: Update flake inputs (weekly)
-        if: github.event_name == 'workflow_dispatch' || steps.weekly.outputs.is_weekly == 'true'
+        # if: github.event_name == 'workflow_dispatch' || steps.weekly.outputs.is_weekly == 'true'
         run: nix flake update --commit-lock-file --accept-flake-config
 
       - name: Setup nvchecker keyfile
@@ -62,7 +64,7 @@ jobs:
 
       - name: Run update script
         env:
-          NIX_PATH: nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz
+          NIX_PATH: nixpkgs=flake:nixpkgs
         run: |
           sed -i 's|#!nix-shell -i bash -p nvfetcher|#!nix-shell -i bash -p|' scripts/update.sh
           sed -i 's|nvfetcher --commit-changes|/tmp/nvfetcher/result/bin/nvfetcher --commit-changes|' scripts/update.sh
