@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p nvfetcher ast-grep jq nix-prefetch
+#!nix-shell -i bash -p ast-grep jq nix-prefetch
 # shellcheck shell=bash
 # See https://discourse.nixos.org/t/25274
 
@@ -7,7 +7,7 @@ set -xeuo pipefail
 
 root="$(readlink --canonicalize -- "$(dirname -- "$0")/..")"
 
-nvfetcher --commit-changes -k ~/.config/nvchecker/keyfile.toml
+/tmp/nvfetcher/result/bin/nvfetcher --commit-changes -k ~/.config/nvchecker/keyfile.toml
 
 if ! git diff --quiet HEAD~1 -- "$root/_sources/generated.nix"; then
 	caddy_default="$root/pkgs/caddy/default.nix"
