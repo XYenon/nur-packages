@@ -61,6 +61,8 @@ jobs:
           echo 'github = "${{ github.token }}"' >> ~/.config/nvchecker/keyfile.toml
 
       - name: Run update script
+        env:
+          NIX_PATH: nixpkgs=https://github.com/NixOS/nixpkgs/archive/refs/heads/nixos-unstable.tar.gz
         run: |
           sed -i 's|#!nix-shell -i bash -p nvfetcher|#!nix-shell -i bash -p|' scripts/update.sh
           sed -i 's|nvfetcher --commit-changes|/tmp/nvfetcher/result/bin/nvfetcher --commit-changes|' scripts/update.sh
