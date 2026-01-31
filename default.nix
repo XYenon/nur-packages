@@ -83,4 +83,5 @@ rec {
   lsp-ai = callPackage ./pkgs/lsp-ai { };
   zsh-smart-suggestion = callPackage ./pkgs/zsh-smart-suggestion { };
   tsl-hat-trie = callPackage ./pkgs/tsl-hat-trie { };
+  kvrocks = callPackage ./pkgs/kvrocks { inherit tsl-hat-trie; };
 }
