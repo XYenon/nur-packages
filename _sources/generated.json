@@ -5,6 +5,7 @@
         "extract": null,
         "name": "WeidiDeng/caddy-cloudflare-ip",
         "passthru": {
+            "isCaddyPlugin": "true",
             "moduleName": "github.com/WeidiDeng/caddy-cloudflare-ip"
         },
         "pinned": false,
@@ -28,6 +29,7 @@
         "extract": null,
         "name": "caddy-dns/cloudflare",
         "passthru": {
+            "isCaddyPlugin": "true",
             "moduleName": "github.com/caddy-dns/cloudflare"
         },
         "pinned": false,
@@ -93,6 +95,7 @@
         "extract": null,
         "name": "fvbommel/caddy-combine-ip-ranges",
         "passthru": {
+            "isCaddyPlugin": "true",
             "moduleName": "github.com/fvbommel/caddy-combine-ip-ranges"
         },
         "pinned": false,
@@ -116,6 +119,7 @@
         "extract": null,
         "name": "mholt/caddy-l4",
         "passthru": {
+            "isCaddyPlugin": "true",
             "moduleName": "github.com/mholt/caddy-l4"
         },
         "pinned": false,
@@ -139,6 +143,7 @@
         "extract": null,
         "name": "mholt/caddy-webdav",
         "passthru": {
+            "isCaddyPlugin": "true",
             "moduleName": "github.com/mholt/caddy-webdav"
         },
         "pinned": false,

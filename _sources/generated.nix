@@ -16,6 +16,7 @@
       fetchSubmodules = false;
       sha256 = "sha256-b2JPVdXBgbI91zRzXGut7QKYT/pe15Gcr3JvIKxvTH4=";
     };
+    isCaddyPlugin = "true";
     moduleName = "github.com/WeidiDeng/caddy-cloudflare-ip";
     date = "20231130002422";
   };
@@ -29,6 +30,7 @@
       fetchSubmodules = false;
       sha256 = "sha256-/FB0a/Ja4kDSw9SlNiusi6w7r87xHXafzEOQqLbTsyA=";
     };
+    isCaddyPlugin = "true";
     moduleName = "github.com/caddy-dns/cloudflare";
     date = "20251204174556";
   };
@@ -66,6 +68,7 @@
       fetchSubmodules = false;
       sha256 = "sha256-kWEOY2Xp7H9mDl8K0Z3YSDZl8vSB0FegyTYzw5/Tg4U=";
     };
+    isCaddyPlugin = "true";
     moduleName = "github.com/fvbommel/caddy-combine-ip-ranges";
     date = "20240127132546";
   };
@@ -79,6 +82,7 @@
       fetchSubmodules = false;
       sha256 = "sha256-4DjBv0PFF2L+b48tvvgNx5twm40ToMXvdm5abw8Zwb8=";
     };
+    isCaddyPlugin = "true";
     moduleName = "github.com/mholt/caddy-l4";
     date = "20260127203130";
   };
@@ -92,6 +96,7 @@
       fetchSubmodules = false;
       sha256 = "sha256-tzg7CxAj8MTdrF1ngutsmTjshvm+OKwl9tZUZRU1EGA=";
     };
+    isCaddyPlugin = "true";
     moduleName = "github.com/mholt/caddy-webdav";
     date = "20260127042217";
   };
