@@ -20,6 +20,13 @@ src.git = "https://github.com/catppuccin/kitty.git"
 fetch.github = "catppuccin/zsh-fsh"
 src.git = "https://github.com/catppuccin/zsh-fsh.git"
 
+["fvbommel/caddy-combine-ip-ranges"]
+passthru = {moduleName = "github.com/fvbommel/caddy-combine-ip-ranges"}
+fetch.github = "fvbommel/caddy-combine-ip-ranges"
+git.date_format = "%Y%m%d%H%M%S"
+git.date_tz = "UTC0"
+src.git = "https://github.com/fvbommel/caddy-combine-ip-ranges.git"
+
 ["mholt/caddy-l4"]
 passthru = {moduleName = "github.com/mholt/caddy-l4"}
 fetch.github = "mholt/caddy-l4"

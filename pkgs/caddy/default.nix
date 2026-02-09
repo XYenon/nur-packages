@@ -14,6 +14,7 @@ let
   pluginRepos = [
     "WeidiDeng/caddy-cloudflare-ip"
     "caddy-dns/cloudflare"
+    "fvbommel/caddy-combine-ip-ranges"
     "mholt/caddy-l4"
     "mholt/caddy-webdav"
   ];
@@ -27,5 +28,5 @@ let
 in
 (caddy.withPlugins.override { inherit go; }) {
   inherit plugins;
-  hash = "sha256-MFXs5JS+15exI80x+jy3x9GkdSDlzh5mMqYPwBkKZj8=";
+  hash = "sha256-RCdAgFQIM3XlQcge1Bd49QjAaTeCUVHiiAgxqIw8nZ4=";
 }
