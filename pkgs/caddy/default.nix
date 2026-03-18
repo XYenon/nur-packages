@@ -18,5 +18,5 @@ let
 in
 (caddy.withPlugins.override { inherit go; }) {
   inherit plugins;
-  hash = "sha256-dhtia9Zr1HIdZB5UBEABrfK/em9KTDnRnGpExNiCblw=";
+  hash = "sha256-Th0SYTGGUHk1esH9MTViUEftEiX903laINhVKiGdpfw=";
 }
