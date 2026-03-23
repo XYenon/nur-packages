@@ -23,7 +23,7 @@
   cpptrace,
   jsoncons,
   span-lite,
-  tsl-hat-trie,
+  hat-trie,
   pegtl,
 }:
 
@@ -199,7 +199,7 @@ stdenv.mkDerivation (finalAttrs: {
     cpptrace
     jsoncons
     span-lite
-    tsl-hat-trie
+    hat-trie
     pegtl
   ];
 
