@@ -67,5 +67,6 @@ stdenv.mkDerivation (finalAttrs: {
     homepage = "https://lily-is.land/kazv/libkazv";
     license = licenses.agpl3Plus;
     maintainers = with maintainers; [ xyenon ];
+    platforms = platforms.linux;
   };
 })
