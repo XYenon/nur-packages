@@ -49,7 +49,6 @@ src.branch = "feat/system-manager"
 
 [nix-package-versions]
 fetch.github = "lazamar/nix-package-versions"
-git.date_tz = "UTC0"
 src.git = "https://github.com/lazamar/nix-package-versions.git"
 
 [rime-ice]
