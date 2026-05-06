@@ -74,17 +74,17 @@
   };
   "mholt/caddy-l4" = {
     pname = "mholt/caddy-l4";
-    version = "d52df4e8a13b892bc47e9f3aca7c199fa83f1104";
+    version = "714ee1ebaa2866e0e6a66ec362bd2dc041b5ada7";
     src = fetchFromGitHub {
       owner = "mholt";
       repo = "caddy-l4";
-      rev = "d52df4e8a13b892bc47e9f3aca7c199fa83f1104";
+      rev = "714ee1ebaa2866e0e6a66ec362bd2dc041b5ada7";
       fetchSubmodules = false;
-      sha256 = "sha256-A7sANoVQ7ABuByGq5IaH6F3J7eospTLImwBq6nq++6A=";
+      sha256 = "sha256-w5JwAkxnWMZd1BAKdHS6A9qDDnOT/+JMUPRqz2KneUU=";
     };
     isCaddyPlugin = "true";
     moduleName = "github.com/mholt/caddy-l4";
-    date = "20260504183635";
+    date = "20260505065500";
   };
   "mholt/caddy-webdav" = {
     pname = "mholt/caddy-webdav";
@@ -102,21 +102,21 @@
   };
   nh = {
     pname = "nh";
-    version = "3a05580c4279705ec3c62a83ecb7b26bc2a59d49";
+    version = "a5f611bde50d54d208bccda2df2bfaae2c135506";
     src = fetchFromGitHub {
       owner = "XYenon";
       repo = "nh";
-      rev = "3a05580c4279705ec3c62a83ecb7b26bc2a59d49";
+      rev = "a5f611bde50d54d208bccda2df2bfaae2c135506";
       fetchSubmodules = false;
-      sha256 = "sha256-XBAcK8eImkhtFfzHSlHfYQELoa0F88Lgkqt0TrSBySs=";
+      sha256 = "sha256-oUaFBq3/u43pM/Z6K4ox82raTo3xgCNCanPH+fnu8vY=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-XBAcK8eImkhtFfzHSlHfYQELoa0F88Lgkqt0TrSBySs=/Cargo.lock";
+      lockFile = ./. + "/sha256-oUaFBq3_u43pM_Z6K4ox82raTo3xgCNCanPH+fnu8vY=/Cargo.lock";
       outputHashes = {
         
       };
     };
-    date = "2026-04-21";
+    date = "2026-05-06";
   };
   nix-package-versions = {
     pname = "nix-package-versions";
@@ -143,15 +143,15 @@
   };
   rime-ice-unstable = {
     pname = "rime-ice-unstable";
-    version = "b4f780430bb8227d07583e4738f1c8f04d3079b8";
+    version = "fae516b9b7acec050d207effd8610fa031ced25c";
     src = fetchFromGitHub {
       owner = "iDvel";
       repo = "rime-ice";
-      rev = "b4f780430bb8227d07583e4738f1c8f04d3079b8";
+      rev = "fae516b9b7acec050d207effd8610fa031ced25c";
       fetchSubmodules = false;
-      sha256 = "sha256-3ltD+fT8Z09u11OMP6sgyw5lhsHNMkuhto27POX6uZA=";
+      sha256 = "sha256-yNqYF/SRsjMMiuOdGWAL7mNwONP0GXQ/71HGn4z4sps=";
     };
-    date = "2026-05-04";
+    date = "2026-05-05";
   };
   rime-moegirl = {
     pname = "rime-moegirl";
