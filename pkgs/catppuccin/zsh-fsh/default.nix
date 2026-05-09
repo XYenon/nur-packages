@@ -7,6 +7,7 @@
 stdenvNoCC.mkDerivation {
   inherit (source) pname src;
   version = "0-unstable-${source.date}";
+  __structuredAttrs = true;
 
   dontBuild = true;
 

@@ -7,9 +7,10 @@
 }:
 
 buildGoModule {
+  __structuredAttrs = true;
+
   pname = "telemikiya";
   version = "0-unstable-2025-06-23";
-
   src = fetchFromGitHub {
     owner = "XYenon";
     repo = "TeleMikiya";

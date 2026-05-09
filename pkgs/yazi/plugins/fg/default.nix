@@ -6,9 +6,10 @@
 }:
 
 stdenvNoCC.mkDerivation {
+  __structuredAttrs = true;
+
   pname = "fg";
   version = "0-unstable-2026-01-03";
-
   src = fetchFromGitHub {
     owner = "DreamMaoMao";
     repo = "fg.yazi";

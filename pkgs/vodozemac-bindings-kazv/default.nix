@@ -7,9 +7,10 @@
 }:
 
 rustPlatform.buildRustPackage {
+  __structuredAttrs = true;
+
   pname = "vodozemac-bindings-kazv";
   version = "0.2.1-unstable-2026-04-04";
-
   src = fetchgit {
     url = "https://r.lily-is.land/the-kazv-project/vodozemac-bindings.git";
     rev = "3cf688afc0c8d6fe77e3eb126888a5ddd191f23b";

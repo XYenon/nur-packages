@@ -9,9 +9,10 @@ let
   endLevel = if isHighEnd then "High" else "Low";
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
+  __structuredAttrs = true;
+
   pname = "Anime4K";
   version = "4.0.1";
-
   src = fetchzip {
     url = "https://github.com/Tama47/Anime4K/releases/download/v${finalAttrs.version}/GLSL_Mac_Linux_${endLevel}-end.zip";
     hash =

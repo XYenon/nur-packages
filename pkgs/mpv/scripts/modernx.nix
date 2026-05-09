@@ -7,9 +7,10 @@
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
+  __structuredAttrs = true;
+
   pname = "ModernX";
   version = "0.4.5";
-
   src = fetchFromGitHub {
     owner = "zydezu";
     repo = "ModernX";

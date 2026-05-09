@@ -6,9 +6,10 @@
 }:
 
 stdenvNoCC.mkDerivation {
+  __structuredAttrs = true;
+
   pname = "librime-qjs";
   version = "1.3.0-unstable-2026-03-27";
-
   src = fetchFromGitHub {
     owner = "HuangJian";
     repo = "librime-qjs";

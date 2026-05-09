@@ -33,6 +33,8 @@
 }:
 
 stdenv.mkDerivation {
+  __structuredAttrs = true;
+
   pname = "kazv";
   version = "0.6.0-unstable-2026-04-09";
 
@@ -80,6 +82,7 @@ stdenv.mkDerivation {
   ];
 
   strictDeps = true;
+  enableParallelBuilding = true;
 
   propagatedBuildInputs = [ breeze-icons ];
 

@@ -6,9 +6,10 @@
 }:
 
 buildGoModule {
+  __structuredAttrs = true;
+
   pname = "go-check";
   version = "0-unstable-2025-06-14";
-
   src = fetchFromGitHub {
     owner = "Dreamacro";
     repo = "go-check";

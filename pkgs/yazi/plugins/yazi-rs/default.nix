@@ -22,6 +22,7 @@ let
         stdenvNoCC.mkDerivation {
           pname = name;
           version = "0-unstable-${date}";
+          __structuredAttrs = true;
 
           inherit src;
 

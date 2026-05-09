@@ -8,9 +8,10 @@
 # To make use of this derivation, use the `programs.zsh.smart-suggestion.enable` option
 
 buildGoModule (finalAttrs: {
+  __structuredAttrs = true;
+
   pname = "zsh-smart-suggestion";
   version = "0.1.15";
-
   src = fetchFromGitHub {
     owner = "XYenon";
     repo = "smart-suggestion";

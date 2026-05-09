@@ -6,9 +6,10 @@
 }:
 
 stdenvNoCC.mkDerivation {
+  __structuredAttrs = true;
+
   pname = "exifaudio";
   version = "0-unstable-2025-06-20";
-
   src = fetchFromGitHub {
     owner = "Sonico98";
     repo = "exifaudio.yazi";

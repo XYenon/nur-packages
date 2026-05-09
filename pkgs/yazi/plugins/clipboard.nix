@@ -6,9 +6,10 @@
 }:
 
 stdenvNoCC.mkDerivation {
+  __structuredAttrs = true;
+
   pname = "clipboard";
   version = "0-unstable-2026-05-08";
-
   src = fetchFromGitHub {
     owner = "XYenon";
     repo = "clipboard.yazi";

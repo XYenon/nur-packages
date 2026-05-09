@@ -19,6 +19,8 @@
 }:
 
 stdenv.mkDerivation (finalAttrs: {
+  __structuredAttrs = true;
+
   pname = "libkazv";
   version = "0.8.0-unstable-2026-04-10";
 
@@ -50,6 +52,7 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   strictDeps = true;
+  enableParallelBuilding = true;
 
   cmakeFlags = [ (lib.cmakeBool "libkazv_BUILD_TESTS" finalAttrs.finalPackage.doCheck) ];
 

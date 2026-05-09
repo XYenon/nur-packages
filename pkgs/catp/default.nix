@@ -7,9 +7,10 @@
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
+  __structuredAttrs = true;
+
   pname = "catp";
   version = "0.2.0";
-
   src = fetchFromGitHub {
     owner = "rapiz1";
     repo = "catp";
