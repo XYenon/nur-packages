@@ -42,10 +42,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     updateScript = nix-update-script { };
   };
 
-  meta = with lib; {
+  meta = {
     description = "A modern OSC UI replacement for MPV that retains the functionality of the default OSC";
     homepage = "https://github.com/zydezu/ModernX";
-    license = licenses.unlicense;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.unlicense;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 })

@@ -28,10 +28,10 @@ stdenvNoCC.mkDerivation {
 
   passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
-  meta = with lib; {
+  meta = {
     description = "Fuzzy find and grep plugin for Yazi file manager with interactive ripgrep/fzf search";
     homepage = "https://github.com/XYenon/yafg.yazi";
-    license = licenses.agpl3Plus;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.agpl3Plus;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 }

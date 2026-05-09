@@ -18,10 +18,10 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
-  meta = with lib; {
+  meta = {
     description = "🐚 Soothing pastel theme for fast-syntax-highlighting";
     homepage = "https://github.com/catppuccin/zsh-fsh";
-    license = licenses.mit;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 }

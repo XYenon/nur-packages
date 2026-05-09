@@ -39,11 +39,11 @@ rustPlatform.buildRustPackage {
 
   passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
-  meta = with lib; {
+  meta = {
     description = "Language bindings for vodozemac";
     homepage = "https://r.lily-is.land/the-kazv-project/vodozemac-bindings";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ xyenon ];
-    platforms = platforms.linux;
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [ xyenon ];
+    platforms = lib.platforms.linux;
   };
 }

@@ -26,11 +26,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     description = "Print the output of a running process";
     homepage = "https://github.com/rapiz1/catp";
-    license = licenses.gpl3;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.gpl3;
+    maintainers = with lib.maintainers; [ xyenon ];
     platforms = [ "x86_64-linux" ];
   };
 })

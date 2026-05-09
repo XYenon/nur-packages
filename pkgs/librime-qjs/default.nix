@@ -32,10 +32,10 @@ stdenvNoCC.mkDerivation {
     tagFormat = "v*";
   };
 
-  meta = with lib; {
+  meta = {
     description = "Bring a fresh JavaScript plugin ecosystem to the Rime Input Method Engine";
     homepage = "https://github.com/HuangJian/librime-qjs";
-    license = licenses.bsd3;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.bsd3;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 }

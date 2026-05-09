@@ -28,11 +28,11 @@ buildGoModule (finalAttrs: {
 
   passthru.updateScript = nix-update-script { };
 
-  meta = with lib; {
+  meta = {
     description = "AI-powered command suggestions directly in your zsh shell";
     homepage = "https://github.com/XYenon/smart-suggestion";
-    license = licenses.unlicense;
-    platforms = platforms.unix;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.unlicense;
+    platforms = lib.platforms.unix;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 })

@@ -62,11 +62,11 @@ in
     with lib.strings;
     version: versionOlder version patch.versionOlder && versionAtLeast version patch.versionAtLeast;
 
-  meta = with lib; {
+  meta = {
     description = "Forward proxy module for CONNECT request handling";
     homepage = "https://github.com/chobits/ngx_http_proxy_connect_module";
-    license = with licenses; [ bsd2 ];
-    maintainers = with maintainers; [ xyenon ];
-    broken = versionAtLeast nginxVersion "1.29.1";
+    license = with lib.licenses; [ bsd2 ];
+    maintainers = with lib.maintainers; [ xyenon ];
+    broken = lib.versionAtLeast nginxVersion "1.29.1";
   };
 }

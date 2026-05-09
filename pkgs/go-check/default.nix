@@ -22,10 +22,10 @@ buildGoModule {
 
   passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
-  meta = with lib; {
+  meta = {
     description = "Check for outdated go module";
     homepage = "https://github.com/Dreamacro/go-check";
-    license = licenses.mit;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 }

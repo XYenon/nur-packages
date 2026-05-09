@@ -75,10 +75,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       config = mpvConf;
     };
 
-  meta = with lib; {
+  meta = {
     description = "A High-Quality Real Time Upscaler for Anime Video";
     homepage = "https://github.com/Tama47/Anime4K";
-    license = licenses.mit;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 })

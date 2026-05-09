@@ -33,10 +33,10 @@ stdenvNoCC.mkDerivation {
 
   passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
-  meta = with lib; {
+  meta = {
     description = "Yazi plugin for rg search with fzf file preview";
     homepage = "https://github.com/DreamMaoMao/fg.yazi";
-    license = licenses.mit;
-    maintainers = with maintainers; [ xyenon ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ xyenon ];
   };
 }
