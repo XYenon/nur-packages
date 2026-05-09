@@ -43,8 +43,7 @@ let
           patchName = "proxy_connect_rewrite_102101";
         }
       ];
-in
-rec {
+
   name = "http_proxy_connect";
   src = fetchFromGitHub {
     inherit name;
@@ -53,6 +52,9 @@ rec {
     rev = "v0.0.7";
     hash = "sha256-Yob2Z+a3ex3Ji6Zz8J0peOYnKpYn5PlC9KsQNcHCL9o=";
   };
+in
+{
+  inherit name src;
 
   patches = [ "${src}/patch/${patch.patchName}.patch" ];
 

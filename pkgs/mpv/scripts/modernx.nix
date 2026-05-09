@@ -6,14 +6,14 @@
   makeFontsConf,
 }:
 
-stdenvNoCC.mkDerivation (finalAttrs: rec {
+stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "ModernX";
   version = "0.4.5";
 
   src = fetchFromGitHub {
     owner = "zydezu";
-    repo = pname;
-    rev = version;
+    repo = "ModernX";
+    rev = finalAttrs.version;
     hash = "sha256-a+StfEYQwt5NuELvanvZllrD2RQ0g9JBpCznMdSDM5Y=";
   };
 

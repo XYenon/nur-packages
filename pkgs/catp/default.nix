@@ -6,14 +6,14 @@
   nix-update-script,
 }:
 
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage (finalAttrs: {
   pname = "catp";
   version = "0.2.0";
 
   src = fetchFromGitHub {
     owner = "rapiz1";
-    repo = pname;
-    rev = "v${version}";
+    repo = "catp";
+    rev = "v${finalAttrs.version}";
     hash = "sha256-yYvJJFXEOxUz+R50ioyHQp3GqF4V8J+vYBPxh4AuA3E=";
   };
 
@@ -33,4 +33,4 @@ rustPlatform.buildRustPackage rec {
     maintainers = with maintainers; [ xyenon ];
     platforms = [ "x86_64-linux" ];
   };
-}
+})

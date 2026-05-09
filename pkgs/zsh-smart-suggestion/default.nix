@@ -7,14 +7,14 @@
 
 # To make use of this derivation, use the `programs.zsh.smart-suggestion.enable` option
 
-buildGoModule rec {
+buildGoModule (finalAttrs: {
   pname = "zsh-smart-suggestion";
   version = "0.1.15";
 
   src = fetchFromGitHub {
     owner = "XYenon";
     repo = "smart-suggestion";
-    tag = "v${version}";
+    tag = "v${finalAttrs.version}";
     hash = "sha256-kq4ixiSUKUlxni7w/5MjDxll900T0fxO1pIzfzg+MDE=";
   };
 
@@ -35,4 +35,4 @@ buildGoModule rec {
     platforms = platforms.unix;
     maintainers = with maintainers; [ xyenon ];
   };
-}
+})
