@@ -2,7 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
-  unstableGitUpdater,
+  nix-update-script,
 }:
 
 stdenvNoCC.mkDerivation {
@@ -28,9 +28,11 @@ stdenvNoCC.mkDerivation {
     runHook postInstall
   '';
 
-  passthru.updateScript = unstableGitUpdater {
-    tagPrefix = "v";
-    tagFormat = "v*";
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version=branch"
+      "--version-regex=^v(.*)$"
+    ];
   };
 
   meta = {
