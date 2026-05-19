@@ -10,7 +10,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   __structuredAttrs = true;
 
   pname = "xurl";
-  version = "0.0.27-unstable-2026-03-23";
+  version = "0-unstable-2026-03-23";
   src = fetchFromGitHub {
     owner = "Xuanwo";
     repo = "xurl";
