@@ -17,14 +17,14 @@
 
 beamPackages.mixRelease rec {
   pname = "pleroma";
-  version = "2.10.2";
+  version = "2.10.0";
 
   src = fetchFromGitea {
     domain = "git.pleroma.social";
     owner = "pleroma";
     repo = "pleroma";
     rev = "v${version}";
-    hash = "sha256-5BFzV2alNDjO/bS08+V4idzFaXQLr+4pNlLLXayBqIE=";
+    hash = "sha256-kW4AcOYHtm8lVXRroDCUM7jY7o39JHx/J/mfy2XfBgs=";
   };
 
   patches = [
@@ -47,7 +47,7 @@ beamPackages.mixRelease rec {
   mixFodDeps = beamPackages.fetchMixDeps {
     pname = "mix-deps-${pname}";
     inherit src version;
-    hash = "sha256-IMVGkX7hioMmHeUY1ajog0262qNQdd0xjJKLdGz1pLE=";
+    hash = "sha256-fBtjC2nLRyvUmdXaiGEwddDCbFQq1uxp9Dd5PHuTyoo=";
 
     postInstall = ''
       substituteInPlace "$out/http_signatures/mix.exs" \
