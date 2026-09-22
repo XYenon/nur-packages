@@ -27,6 +27,7 @@
   nlohmann_json,
   libkazv,
   cmark,
+  lexbor,
   qcoro,
   breeze-icons,
   nix-update-script,
@@ -77,6 +78,7 @@ stdenv.mkDerivation {
     nlohmann_json
     libkazv
     cmark
+    lexbor
     qcoro
   ];
 
