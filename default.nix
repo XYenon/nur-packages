@@ -93,4 +93,5 @@ rec {
   lazyrsync = callPackage ./pkgs/lazyrsync { };
   magpie = callPackage ./pkgs/magpie { };
   pgbot = callPackage ./pkgs/pgbot { };
+  pgterm = callPackage ./pkgs/pgterm { inherit pgbot; };
 }
