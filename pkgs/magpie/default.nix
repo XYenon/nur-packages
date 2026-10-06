@@ -94,9 +94,19 @@ buildGoModule (finalAttrs: {
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [ dbus ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcbuild ];
-  # The native AppKit/WebKit panel test fails in the Darwin build sandbox.
-  checkFlags = lib.optionals stdenv.hostPlatform.isDarwin [
-    "-skip=^TestTrayCellClickReleasedPanel$"
+  checkFlags = [
+    "-skip=^(${
+      lib.concatStringsSep "|" (
+        [
+          # Downloads Bun from GitHub, which is unavailable in the build sandbox.
+          "TestPluginListSaysMiddleware"
+          # The WSL probe finds omp but reports an empty version in Linux sandbox builds.
+          "TestWSLProbeFindsBunOmp"
+        ]
+        # The native AppKit/WebKit panel test fails in the Darwin build sandbox.
+        ++ lib.optional stdenv.hostPlatform.isDarwin "TestTrayCellClickReleasedPanel"
+      )
+    })$"
   ];
   checkPhase = ''
     runHook preCheck
