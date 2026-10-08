@@ -16,6 +16,10 @@
   nix-update-script,
   coreutils,
   python3,
+  bun,
+  procps,
+  zsh,
+  darwin,
   dbus,
   xdg-utils,
   xcbuild,
@@ -75,6 +79,9 @@ buildGoModule (finalAttrs: {
   ];
 
   preCheck = ''
+    export MAGPIE_BUN=${lib.getExe bun}
+    substituteInPlace main_test.go internal/plugin/main_test.go \
+      --replace-fail 'testenv.Main(m)' 'testenv.Offline(); testenv.Main(m)'
     substituteInPlace internal/gateway/automode_test.go \
       --replace-fail '#!/usr/bin/env python3' '#!${lib.getExe python3}'
     # Allow the filesystem change-time clock to advance before the same-size rewrite.
@@ -108,20 +115,20 @@ buildGoModule (finalAttrs: {
   '';
   nativeCheckInputs = [
     python3
+    bun
+    zsh
   ]
-  ++ lib.optionals stdenv.hostPlatform.isLinux [ dbus ]
-  ++ lib.optionals stdenv.hostPlatform.isDarwin [ xcbuild ];
+  ++ lib.optionals stdenv.hostPlatform.isLinux [
+    dbus
+    procps
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    xcbuild
+    darwin.adv_cmds
+  ];
   checkFlags = [
-    "-skip=^(${
-      lib.concatStringsSep "|" [
-        # Requires ps to query process groups and sessions in the build sandbox.
-        "TestAskShellOwnSession"
-        # Downloads Bun from GitHub, which is unavailable in the build sandbox.
-        "TestPluginListSaysMiddleware"
-        # The WSL probe finds omp but reports an empty version in Linux sandbox builds.
-        "TestWSLProbeFindsBunOmp"
-      ]
-    })$"
+    # The WSL probe finds omp but reports an empty version in Linux sandbox builds.
+    "-skip=^TestWSLProbeFindsBunOmp$"
   ];
   checkPhase = ''
     runHook preCheck
