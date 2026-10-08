@@ -26,13 +26,13 @@ buildGoModule (finalAttrs: {
   __structuredAttrs = true;
 
   pname = "magpie";
-  version = "0.1.1108";
+  version = "0.1.1118";
 
   src = fetchFromGitHub {
     owner = "yetone";
     repo = "magpie";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-M8M+E3aGXfSxRwIXGvSQCpki8p4HLsvJ7Yc0LKIenI0=";
+    hash = "sha256-lDMiXvBg4SCgN0PWiPzRj9CfEtEJ7S8GMSxVMm96Kvg=";
   };
 
   vendorHash = "sha256-dqFc8UTREaRFt3G3DS7IllBx8ysOlcA5JUqGaQ/XlcI=";
@@ -106,8 +106,12 @@ buildGoModule (finalAttrs: {
           # The WSL probe finds omp but reports an empty version in Linux sandbox builds.
           "TestWSLProbeFindsBunOmp"
         ]
-        # The native AppKit/WebKit panel test fails in the Darwin build sandbox.
-        ++ lib.optional stdenv.hostPlatform.isDarwin "TestTrayCellClickReleasedPanel"
+        # Native AppKit/WebKit window tests fail in the Darwin build sandbox.
+        ++ lib.optionals stdenv.hostPlatform.isDarwin [
+          "TestTrayCellClickReleasedPanel"
+          "TestPanelCloseHidesIt"
+          "TestDockReopenKeepsTheWindowsSpace"
+        ]
       )
     })$"
   ];
