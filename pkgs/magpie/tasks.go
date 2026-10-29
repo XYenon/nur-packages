@@ -1,48 +1,64 @@
 package fixture
 
 import (
+	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 )
 
-var nixTasks = struct {
-	sync.Mutex
+type resource struct {
+	path    string
 	pending int
 	changed *sync.Cond
-}{}
-
-// Register before starting the goroutine so cleanup sees work not yet scheduled.
-func nixBeginTask() func() {
-	nixTasks.Lock()
-	if nixTasks.changed == nil {
-		nixTasks.changed = sync.NewCond(&nixTasks.Mutex)
-	}
-	nixTasks.pending++
-	nixTasks.Unlock()
-	return func() {
-		nixTasks.Lock()
-		nixTasks.pending--
-		nixTasks.changed.Broadcast()
-		nixTasks.Unlock()
-	}
 }
 
-func nixTaskTempDir(t testing.TB, settle ...func()) string {
-	t.Helper()
-	dir := t.TempDir()
-	t.Cleanup(func() {
-		for _, wait := range settle {
-			wait()
+var resources = struct {
+	sync.Mutex
+	groups map[*resource]bool
+}{groups: map[*resource]bool{}}
+
+// A task joins only groups whose registered paths contain its file operations.
+// Register before starting work; waiting is per resource, not per package or goroutine.
+func Begin(paths ...string) func() {
+	resources.Lock()
+	var joined []*resource
+	for group := range resources.groups {
+		for _, path := range paths {
+			path = filepath.Clean(path)
+			if path == group.path || strings.HasPrefix(path, group.path+string(filepath.Separator)) {
+				group.pending++
+				joined = append(joined, group)
+				break
+			}
 		}
-		nixWaitTasks()
-	})
-	return dir
+	}
+	resources.Unlock()
+	return func() {
+		resources.Lock()
+		defer resources.Unlock()
+		for _, group := range joined {
+			group.pending--
+			group.changed.Broadcast()
+		}
+	}
 }
 
-func nixWaitTasks() {
-	nixTasks.Lock()
-	defer nixTasks.Unlock()
-	for nixTasks.pending != 0 {
-		nixTasks.changed.Wait()
-	}
+func TempDir(t testing.TB) string {
+	t.Helper()
+	path := t.TempDir()
+	group := &resource{path: filepath.Clean(path)}
+	resources.Lock()
+	group.changed = sync.NewCond(&resources.Mutex)
+	resources.groups[group] = true
+	resources.Unlock()
+	t.Cleanup(func() {
+		resources.Lock()
+		defer resources.Unlock()
+		for group.pending != 0 {
+			group.changed.Wait()
+		}
+		delete(resources.groups, group)
+	})
+	return path
 }

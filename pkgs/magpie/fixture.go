@@ -54,8 +54,21 @@ func NixWriteFixture(path string, write func() error) error {
 	if fi, err := os.Stat(dir); err == nil {
 		before = fi.ModTime()
 	}
+	content, readErr := os.ReadFile(path)
+	link, linkErr := os.Readlink(path)
+	prior, _ := os.Stat(path)
 	if err := write(); err != nil {
 		return err
+	}
+	if prior != nil {
+		after, _ := os.Stat(path)
+		if after != nil && os.SameFile(prior, after) {
+			current, err := os.ReadFile(path)
+			currentLink, currentLinkErr := os.Readlink(path)
+			if readErr == nil && err == nil && bytes.Equal(content, current) && (linkErr == nil) == (currentLinkErr == nil) && link == currentLink {
+				return nil
+			}
+		}
 	}
 	return NixTouchDir(dir, before)
 }
@@ -67,7 +80,18 @@ func NixWriteFile(path string, data []byte, mode os.FileMode) error {
 }
 
 func NixRename(old, destination string) error {
-	return NixWriteFixture(destination, func() error { return os.Rename(old, destination) })
+	sourceDir, destinationDir := filepath.Dir(old), filepath.Dir(destination)
+	var before time.Time
+	if fi, err := os.Stat(sourceDir); err == nil {
+		before = fi.ModTime()
+	}
+	if err := NixWriteFixture(destination, func() error { return os.Rename(old, destination) }); err != nil {
+		return err
+	}
+	if sourceDir != destinationDir {
+		return NixTouchDir(sourceDir, before)
+	}
+	return nil
 }
 
 func NixSymlink(target, destination string) error {

@@ -64,7 +64,6 @@ type sourceFile struct {
 	fset     *token.FileSet
 	file     *ast.File
 	edits    []edit
-	tasks    bool
 }
 
 // text preserves the original spelling of upstream expressions reused in generated code.
@@ -258,17 +257,9 @@ func (f *sourceFile) fixtures(tools string, cleanup bool) {
 		case *ast.CallExpr:
 			// Background plugin writes can race TempDir removal and recreate directories;
 			// settle that work before testing removes its temporary directories.
-			if selector, ok := node.Fun.(*ast.SelectorExpr); ok && selector.Sel.Name == "TempDir" && len(node.Args) == 0 && (cleanup || f.tasks) {
+			if selector, ok := node.Fun.(*ast.SelectorExpr); ok && selector.Sel.Name == "TempDir" && len(node.Args) == 0 && cleanup {
 				if receiver, ok := selector.X.(*ast.Ident); ok && params[receiver.Obj] != "" {
-					name := "nixTempDir"
-					args := receiver.Name
-					if f.tasks {
-						name = "nixTaskTempDir"
-						if cleanup {
-							args += ", " + f.qualify("github.com/yetone/magpie/internal/plugin", "Settle")
-						}
-					}
-					f.replace(node, name+"("+args+")")
+					f.replace(node, "nixTempDir("+receiver.Name+")")
 				}
 			}
 			// Setenv needs the same system-PATH adaptation as command environment slices.
@@ -396,380 +387,17 @@ func (f *sourceFile) methodCall(call *ast.CallExpr, receiver ast.Expr, name stri
 	return ok && selector.Sel.Name == name && f.text(selector.X) == f.text(receiver)
 }
 
-type taskFunction struct {
-	file *sourceFile
-	decl *ast.FuncDecl
-}
-
-// Follow same-package helpers from tests, including callbacks, without requiring helper names.
-func patchBackgroundTasks(files []*sourceFile) {
-	packages := map[string]map[string][]taskFunction{}
-	for _, f := range files {
-		key := filepath.ToSlash(filepath.Dir(f.path)) + "/" + f.file.Name.Name
-		if packages[key] == nil {
-			packages[key] = map[string][]taskFunction{}
-		}
-		for _, decl := range f.file.Decls {
-			if fn, ok := decl.(*ast.FuncDecl); ok && fn.Body != nil && fn.Recv == nil {
-				packages[key][fn.Name.Name] = append(packages[key][fn.Name.Name], taskFunction{f, fn})
-			}
-		}
-	}
-	for key, functions := range packages {
-		parts := strings.Split(key, "/")
-		if len(parts) < 2 || parts[len(parts)-1] != parts[len(parts)-2] || strings.HasSuffix(key, "/testenv") {
-			continue
-		}
-		reachable := map[*ast.FuncDecl]bool{}
-		var visit func(taskFunction)
-		visit = func(fn taskFunction) {
-			if reachable[fn.decl] {
-				return
-			}
-			reachable[fn.decl] = true
-			ast.Inspect(fn.decl.Body, func(n ast.Node) bool {
-				if ident, ok := n.(*ast.Ident); ok {
-					for _, next := range functions[ident.Name] {
-						visit(next)
-					}
-				}
-				return true
-			})
-		}
-		for _, candidates := range functions {
-			for _, fn := range candidates {
-				if strings.HasSuffix(fn.file.path, "_test.go") && (strings.HasPrefix(fn.decl.Name.Name, "Test") || fn.file.testReceiver(fn.decl.Type.Params) != "") {
-					visit(fn)
-				}
-			}
-		}
-		// Only bounded local work is tracked. Servers, channel waits, recursive calls and
-		// unknown callbacks can live until cleanup and must not be awaited beforehand.
-		cache := map[*ast.FuncDecl][2]bool{}
-		var finiteWrite func(*sourceFile, ast.Node, map[*ast.FuncDecl]bool) (bool, bool)
-		finiteWrite = func(f *sourceFile, body ast.Node, seen map[*ast.FuncDecl]bool) (bool, bool) {
-			writes, finite := false, true
-			ast.Inspect(body, func(n ast.Node) bool {
-				if !finite {
-					return false
-				}
-				switch node := n.(type) {
-				case *ast.ForStmt:
-					if node.Cond == nil {
-						finite = false
-					}
-				case *ast.RangeStmt:
-					if ident, ok := node.X.(*ast.Ident); ok && ident.Obj != nil {
-						if field, ok := ident.Obj.Decl.(*ast.Field); ok {
-							if _, channel := field.Type.(*ast.ChanType); channel {
-								finite = false
-							}
-						}
-						if assignment, ok := ident.Obj.Decl.(*ast.AssignStmt); ok {
-							for _, value := range assignment.Rhs {
-								if call, ok := value.(*ast.CallExpr); ok && len(call.Args) > 0 {
-									if _, channel := call.Args[0].(*ast.ChanType); channel {
-										finite = false
-									}
-								}
-							}
-						}
-					}
-				case *ast.SelectStmt, *ast.SendStmt:
-					finite = false
-				case *ast.UnaryExpr:
-					if node.Op == token.ARROW {
-						finite = false
-					}
-				case *ast.GoStmt:
-					finite = false
-				case *ast.CallExpr:
-					if literal, ok := node.Fun.(*ast.FuncLit); ok {
-						w, b := finiteWrite(f, literal.Body, seen)
-						writes = writes || w
-						finite = finite && b
-						return false
-					}
-					if ident, ok := node.Fun.(*ast.Ident); ok {
-						if ident.Name == "make" || ident.Name == "new" || ident.Name == "len" || ident.Name == "append" || ident.Name == "string" || ident.Name == "copy" || ident.Name == "delete" {
-							return true
-						}
-						candidates := functions[ident.Name]
-						if len(candidates) == 0 {
-							if ident.Obj != nil {
-								if _, parameter := ident.Obj.Decl.(*ast.Field); parameter {
-									finite = false
-								}
-							}
-							return true
-						}
-						for _, callee := range candidates {
-							if seen[callee.decl] {
-								finite = false
-								break
-							}
-							result, cached := cache[callee.decl]
-							if !cached {
-								seen[callee.decl] = true
-								w, b := finiteWrite(callee.file, callee.decl.Body, seen)
-								delete(seen, callee.decl)
-								result = [2]bool{w, b}
-								cache[callee.decl] = result
-							}
-							writes = writes || result[0]
-							finite = finite && result[1]
-						}
-						return false
-					}
-					if selector, ok := node.Fun.(*ast.SelectorExpr); ok {
-						if f.call(node, "os", "WriteFile") || f.call(node, "os", "Rename") || f.call(node, "os", "Remove") || f.call(node, "os", "RemoveAll") || f.call(node, "os", "MkdirAll") || f.call(node, "os", "Symlink") || f.call(node, "os", "OpenFile") || f.call(node, "os", "Create") {
-							writes = true
-							return true
-						}
-						for _, path := range []string{"fmt", "strings", "bytes", "path/filepath", "encoding/json", "errors"} {
-							if receiver, ok := selector.X.(*ast.Ident); ok && receiver.Name == f.importName(path) {
-								return true
-							}
-						}
-						if f.call(node, "os", "ReadFile") || f.call(node, "os", "Stat") || f.call(node, "time", "Now") {
-							return true
-						}
-					}
-					if selector, ok := node.Fun.(*ast.SelectorExpr); ok {
-						switch selector.Sel.Name {
-						case "Serve", "ServeHTTP", "ListenAndServe", "Wait", "Run", "Start", "Dial", "DialContext", "Do", "Get", "Post", "Sleep", "WaitContext":
-							finite = false
-						}
-					}
-				}
-				return true
-			})
-			return writes, finite
-		}
-		tracked := false
-		for _, candidates := range functions {
-			for _, fn := range candidates {
-				if !reachable[fn.decl] {
-					continue
-				}
-				ast.Inspect(fn.decl.Body, func(n ast.Node) bool {
-					stmt, ok := n.(*ast.GoStmt)
-					if !ok {
-						return true
-					}
-					writes, finite := finiteWrite(fn.file, stmt.Call, map[*ast.FuncDecl]bool{fn.decl: true})
-					if !writes || !finite {
-						return false
-					}
-					call := stmt.Call
-					// Evaluate the function and arguments in the caller, as the original go does.
-					var setup, args []string
-					setup = append(setup, "nixTaskCall := "+fn.file.text(call.Fun))
-					for i, arg := range call.Args {
-						name := fmt.Sprintf("nixTaskArg%d", i)
-						setup = append(setup, name+" := "+fn.file.text(arg))
-						args = append(args, name)
-					}
-					if call.Ellipsis.IsValid() && len(args) > 0 {
-						args[len(args)-1] += "..."
-					}
-					setup = append(setup, "nixTaskDone := nixBeginTask()")
-					fn.file.replace(stmt, "{\n"+strings.Join(setup, "\n")+"\ngo func() { defer nixTaskDone(); nixTaskCall("+strings.Join(args, ",")+") }()\n}")
-					tracked = true
-					return false
-				})
-			}
-		}
-		if tracked {
-			for _, f := range files {
-				if filepath.ToSlash(filepath.Dir(f.path))+"/"+f.file.Name.Name == key {
-					f.tasks = true
-				}
-			}
-		}
-	}
-}
-
-// mcpStreams prepares the call's SSE receiver before the child can ask the client anything.
-// Restrict reordering to the known wait/send/Accept/open/defer lifecycle; unknown shapes fail.
-func (f *sourceFile) mcpStreams() error {
-	matched := 0
-	for _, decl := range f.file.Decls {
-		fn, ok := decl.(*ast.FuncDecl)
-		if !ok || fn.Body == nil {
-			continue
-		}
-		httpHandler := false
-		for _, field := range fn.Type.Params.List {
-			if selector, ok := field.Type.(*ast.SelectorExpr); ok && f.text(selector) == f.importName("net/http")+".ResponseWriter" {
-				httpHandler = true
-			}
-		}
-		if !httpHandler {
-			continue
-		}
-		body := fn.Body.List
-		for i, stmt := range body {
-			assignment, ok := stmt.(*ast.AssignStmt)
-			if !ok || len(assignment.Lhs) != 1 || len(assignment.Rhs) != 1 {
-				continue
-			}
-			wait, ok := assignment.Rhs[0].(*ast.CallExpr)
-			if !ok {
-				continue
-			}
-			child, ok := wait.Fun.(*ast.SelectorExpr)
-			if !ok || child.Sel.Name != "wait" {
-				continue
-			}
-			matched++
-			sendAt, guardAt, openAt := -1, -1, -1
-			var guard *ast.IfStmt
-			var registration *ast.AssignStmt
-			var open *ast.CallExpr
-			for j := i + 1; j < len(body); j++ {
-				switch node := body[j].(type) {
-				case *ast.IfStmt:
-					if init, ok := node.Init.(*ast.AssignStmt); ok && len(init.Rhs) == 1 {
-						if call, ok := init.Rhs[0].(*ast.CallExpr); ok && f.methodCall(call, child.X, "send") {
-							if sendAt != -1 {
-								return fmt.Errorf("%s: ambiguous MCP send", f.path)
-							}
-							sendAt = j
-						}
-					}
-					if condition, ok := node.Cond.(*ast.UnaryExpr); ok && condition.Op == token.NOT {
-						if call, ok := condition.X.(*ast.CallExpr); ok && f.call(call, "strings", "Contains") && len(call.Args) == 2 && firstString(call.Args[1]) == "text/event-stream" {
-							if guard != nil {
-								return fmt.Errorf("%s: ambiguous MCP Accept guard", f.path)
-							}
-							guardAt, guard = j, node
-						}
-					}
-				case *ast.AssignStmt:
-					if len(node.Lhs) == 1 && len(node.Rhs) == 1 && node.Tok == token.DEFINE {
-						if call, ok := node.Rhs[0].(*ast.CallExpr); ok {
-							if method, ok := call.Fun.(*ast.SelectorExpr); ok && method.Sel.Name == "open" && len(call.Args) == 0 {
-								if openAt != -1 {
-									return fmt.Errorf("%s: ambiguous MCP stream registration", f.path)
-								}
-								openAt, registration, open = j, node, call
-							}
-						}
-					}
-				}
-			}
-			if sendAt == -1 || guard == nil || guard.Init != nil || guard.Else != nil {
-				return fmt.Errorf("%s: cannot locate MCP send and SSE guard", f.path)
-			}
-			condition := guard.Cond.(*ast.UnaryExpr).X
-			// Our conditional registration is already before send on a second pass.
-			if openAt == -1 && sendAt > i+1 {
-				if prepared, ok := body[sendAt-1].(*ast.IfStmt); ok && f.text(prepared.Cond) == f.text(condition) {
-					if len(prepared.Body.List) == 2 {
-						set, a := prepared.Body.List[0].(*ast.AssignStmt)
-						cleanup, b := prepared.Body.List[1].(*ast.DeferStmt)
-						if a && b && len(set.Rhs) == 1 && len(set.Lhs) == 1 {
-							if call, ok := set.Rhs[0].(*ast.CallExpr); ok {
-								if method, ok := call.Fun.(*ast.SelectorExpr); ok && method.Sel.Name == "open" && f.methodCall(cleanup.Call, method.X, "close") && len(cleanup.Call.Args) == 1 && f.text(cleanup.Call.Args[0]) == f.text(set.Lhs[0]) {
-									continue
-								}
-							}
-						}
-					}
-				}
-			}
-			if sendAt != i+1 || guardAt <= sendAt || openAt != guardAt+1 || openAt+1 >= len(body) {
-				return fmt.Errorf("%s: unsupported MCP stream ordering", f.path)
-			}
-			receiver, known := open.Fun.(*ast.SelectorExpr).X.(*ast.Ident)
-			if !known || receiver.Obj == nil || receiver.Obj.Pos() >= body[sendAt].Pos() {
-				return fmt.Errorf("%s: unknown MCP stream receiver", f.path)
-			}
-			cleanup, ok := body[openAt+1].(*ast.DeferStmt)
-			if !ok || !f.methodCall(cleanup.Call, receiver, "close") || len(cleanup.Call.Args) != 1 || f.text(cleanup.Call.Args[0]) != f.text(registration.Lhs[0]) {
-				return fmt.Errorf("%s: cannot locate MCP stream cleanup", f.path)
-			}
-			name := f.text(registration.Lhs[0])
-			f.insert(body[sendAt].Pos(), "var "+name+" chan []byte\nif "+f.text(condition)+" {\n"+name+" = "+f.text(open)+"\n"+f.text(cleanup)+"\n}\n")
-			f.replace(registration, "")
-			f.replace(cleanup, "")
-		}
-	}
-	if matched != 1 {
-		return fmt.Errorf("%s: expected one MCP stream lifecycle, found %d", f.path, matched)
-	}
-	return nil
-}
-
-// handoverListeners follows cancellation handles returned by listening, not test names.
-// Wait for the listener to close, not for the server to finish draining its live stream.
-func (f *sourceFile) handoverListeners(fn *ast.FuncDecl) {
-	test := f.testReceiver(fn.Type.Params)
-	if test == "" {
-		return
-	}
-	ast.Inspect(fn.Body, func(n ast.Node) bool {
-		block, ok := n.(*ast.BlockStmt)
-		if !ok {
-			return true
-		}
-		for i, stmt := range block.List {
-			assignment, ok := stmt.(*ast.AssignStmt)
-			if !ok || len(assignment.Lhs) != 2 || len(assignment.Rhs) != 1 {
-				continue
-			}
-			call, ok := assignment.Rhs[0].(*ast.CallExpr)
-			if !ok || !f.call(call, "", "listening") || len(call.Args) != 2 {
-				continue
-			}
-			cancel, ok := assignment.Lhs[0].(*ast.Ident)
-			if !ok || cancel.Name == "_" {
-				continue
-			}
-			server := call.Args[1]
-			handedOver := false
-			for j := i + 1; j < len(block.List); j++ {
-				expr, ok := block.List[j].(*ast.ExprStmt)
-				if !ok {
-					continue
-				}
-				operation, ok := expr.X.(*ast.CallExpr)
-				if !ok {
-					continue
-				}
-				if f.methodCall(operation, server, "HandOff") {
-					handedOver = true
-				}
-				if !handedOver || !f.call(operation, "", cancel.Name) {
-					continue
-				}
-				if j+1 < len(block.List) && strings.Contains(f.text(block.List[j+1]), "handed-over listener did not close") {
-					continue
-				}
-				f.insert(expr.End(), `
-for deadline := `+f.qualify("time", "Now")+`().Add(10 * `+f.qualify("time", "Second")+`); ; {
- file, err := `+f.text(server)+`.ListenerFile()
- if `+f.qualify("errors", "Is")+`(err, `+f.qualify("net", "ErrClosed")+`) { break }
- if err != nil { `+test+`.Fatal(err) }
- file.Close()
- if `+f.qualify("time", "Now")+`().After(deadline) { `+test+`.Fatal("handed-over listener did not close") }
- `+f.qualify("time", "Sleep")+`(`+f.qualify("time", "Millisecond")+`)
-}`)
-			}
-		}
-		return true
-	})
-}
-
 // patchRuntime applies protocol ordering and GUI launcher policies.
 // These edits enter the installed binary; GUI policies only affect active platform sources.
 func patchRuntime(files []*sourceFile, o options) error {
 	for _, f := range files {
 		if !strings.HasSuffix(f.path, "_test.go") && f.hasCall(f.file, "strings", "Contains") {
-			before := len(f.edits)
-			if err := f.mcpStreams(); err != nil {
-				f.edits = f.edits[:before]
+			for i := 0; i < len(f.file.Decls); i++ {
+				fn, ok := f.file.Decls[i].(*ast.FuncDecl)
+				if !ok {
+					continue
+				}
+				candidate([]*sourceFile{f}, func() bool { return f.mcpStream(fn) == nil })
 			}
 		}
 	}
@@ -1045,7 +673,7 @@ func (f *sourceFile) fixtureWrites(fn *ast.FuncDecl) {
 // Nix runs this after the application build, so non-test source edits also affect only tests.
 func patchChecks(files []*sourceFile, o options) error {
 	cleanup := cleanupPackages(files)
-	patchBackgroundTasks(files)
+	clock := discoveryPackages(files)
 	for _, f := range files {
 		dir := filepath.ToSlash(filepath.Dir(f.path))
 		test := strings.HasSuffix(f.path, "_test.go")
@@ -1104,7 +732,7 @@ func patchChecks(files []*sourceFile, o options) error {
 				f.replace(fn.Body, "{ return NixWriteFixture("+fn.Type.Params.List[0].Names[0].Name+", func() "+f.text(fn.Type.Results)+" "+f.text(fn.Body)+") }")
 			}
 			// Follow fixture behavior rather than helper names added or renamed upstream.
-			if test && dir != "internal/testenv" {
+			if test && clock[dir] && dir != "internal/testenv" {
 				f.fixtureWrites(fn)
 			}
 			// Kernel mtimes can lag backup.Created's wall clock, making a newer test edit
@@ -1385,6 +1013,9 @@ func installHelper(dir, name string, o options) error {
 		return err
 	}
 	path := filepath.Join(dir, "nix_"+name)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
 	old, err := os.ReadFile(path)
 	if err == nil && bytes.Equal(old, formatted) {
 		return nil
@@ -1405,14 +1036,10 @@ func installHelper(dir, name string, o options) error {
 func installHelpers(files []*sourceFile, o options) error {
 	cleanup := cleanupPackages(files)
 	dirs := map[string]bool{}
-	tasks := map[string]bool{}
 	testenv := false
 	for _, f := range files {
 		if cleanupPackage(f, cleanup) {
 			dirs[filepath.Dir(f.path)] = true
-		}
-		if f.tasks {
-			tasks[filepath.Dir(f.path)] = true
 		}
 		if filepath.ToSlash(filepath.Dir(f.path)) == "internal/testenv" && f.file.Name.Name == "testenv" {
 			testenv = true
@@ -1428,10 +1055,8 @@ func installHelpers(files []*sourceFile, o options) error {
 	if o.templates == "" {
 		return nil
 	}
-	for dir := range tasks {
-		if err := installHelper(dir, "tasks.go", o); err != nil {
-			return err
-		}
+	if err := installHelper("internal/nixtasks", "tasks.go", o); err != nil {
+		return err
 	}
 	for dir := range dirs {
 		if err := installHelper(dir, "tempdir_test.go", o); err != nil {
@@ -1457,6 +1082,7 @@ func installHelpers(files []*sourceFile, o options) error {
 // The check phase also installs the helper sources needed by the adapted tests.
 func adapt(o options) error {
 	var files []*sourceFile
+	fset := token.NewFileSet()
 	err := filepath.WalkDir(".", func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -1474,7 +1100,6 @@ func adapt(o options) error {
 		if err != nil {
 			return err
 		}
-		fset := token.NewFileSet()
 		file, err := parser.ParseFile(fset, path, source, parser.ParseComments)
 		if err != nil {
 			return fmt.Errorf("%s: %w", path, err)
@@ -1486,9 +1111,48 @@ func adapt(o options) error {
 		return err
 	}
 	if o.phase == "runtime" {
+		snapshotReports(files, o)
 		err = patchRuntime(files, o)
 	} else {
+		taskResources(files, o)
+		for _, f := range files {
+			if len(f.edits) > 0 {
+				patched, applyErr := applyEdits(f.source, f.edits)
+				if applyErr != nil {
+					return applyErr
+				}
+				if err := reparse(f, patched); err != nil {
+					return err
+				}
+			}
+		}
+		shellFixtures(files, o)
+		for _, f := range files {
+			if len(f.edits) > 0 {
+				patched, applyErr := applyEdits(f.source, f.edits)
+				if applyErr != nil {
+					return applyErr
+				}
+				if err := reparse(f, patched); err != nil {
+					return err
+				}
+			}
+		}
 		err = patchChecks(files, o)
+		if err == nil {
+			for _, f := range files {
+				if len(f.edits) > 0 {
+					patched, e := applyEdits(f.source, f.edits)
+					if e != nil {
+						return e
+					}
+					if e = reparse(f, patched); e != nil {
+						return e
+					}
+				}
+			}
+			registerTaskDirectories(files)
+		}
 	}
 	if err != nil {
 		return err
@@ -1514,15 +1178,15 @@ func adapt(o options) error {
 		}
 		changed = append(changed, f.path)
 	}
+	if o.phase == "check" {
+		if err := installHelpers(files, o); err != nil {
+			return err
+		}
+	}
 	if len(changed) > 0 {
 		cmd := exec.Command("goimports", append([]string{"-w"}, changed...)...)
 		if out, err := cmd.CombinedOutput(); err != nil {
 			return fmt.Errorf("goimports: %w\n%s", err, out)
-		}
-	}
-	if o.phase == "check" {
-		if err := installHelpers(files, o); err != nil {
-			return err
 		}
 	}
 	fmt.Printf("magpie %s: adapted %d source files\n", o.phase, len(changed))

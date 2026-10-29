@@ -35,6 +35,7 @@
 let
   linuxGui = guiSupport && stdenv.hostPlatform.isLinux;
   darwinGui = guiSupport && stdenv.hostPlatform.isDarwin;
+  patchSources = "${./patch.go} ${./analysis.go} ${./calls.go} ${./protocol.go} ${./transforms.go} ${./discovery.go}";
   patchArgs = "-platform ${stdenv.hostPlatform.parsed.kernel.name} -arch ${stdenv.hostPlatform.go.GOARCH} -gui=${lib.boolToString guiSupport} -launcher $out/bin/magpie -bun ${lib.getExe bun}";
   testTools = buildEnv {
     name = "magpie-test-tools";
@@ -68,7 +69,7 @@ buildGoModule (finalAttrs: {
   postPatch = ''
     export GOCACHE=$TMPDIR/go-cache
     export GOPATH=$TMPDIR/go
-    GOFLAGS= GOPROXY=off GOSUMDB=off go run ${./patch.go} -phase runtime ${patchArgs}
+    GOFLAGS= GOPROXY=off GOSUMDB=off go run ${patchSources} -phase runtime ${patchArgs}
   '';
 
   subPackages = [ "." ];
@@ -87,7 +88,7 @@ buildGoModule (finalAttrs: {
   # Apply test-only adaptations after compilation to keep them out of the installed binary.
   preCheck = ''
     export MAGPIE_BUN=${lib.getExe bun}
-    GOFLAGS= go run ${./patch.go} -phase check ${patchArgs} \
+    GOFLAGS= go run ${patchSources} -phase check ${patchArgs} \
       -tools ${testTools}/bin -templates ${./.} \
       ${lib.optionalString stdenv.hostPlatform.isLinux "-dbus ${dbus}/share/dbus-1/session.conf"}
   '';
